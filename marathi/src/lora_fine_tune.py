@@ -14,7 +14,7 @@ modified_base = 'marathi-bert-modified-lt-edi'
 base_model = 'l3cube-pune/marathi-bert-v2'
 
 train_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv')
-val_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_val.csv')
+val_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
 test_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv')
 
 train_df = random_undersample(train_df)
@@ -40,15 +40,15 @@ test_df['content'] = test_df['content'].apply(remove_emojis)
 train_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv',index = False)
 val_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv',index = False)
 test_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv',index = False)
+print('\033[96m' + 'Preprocessed CSV  ready'+ '\033[0m')
 
 train_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_train.csv')
 val_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
 test_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_test.csv')
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
-
 num_labels = 3
-class_names = ['None','Homophobia','Transphobia']
+class_names = ['None of the categories','Homophobia','Transphobia']
 
 id2label = {i: label for i, label in enumerate(class_names)}
 label2id = {label: i for i,label in enumerate(class_names)}
