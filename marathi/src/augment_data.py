@@ -3,9 +3,9 @@ import pandas as pd
 
 def random_undersample(df,random_seed = 42,desired_samples = 450):
     np.random.seed(random_seed)
-    class_1_df = df[df['content'] == 'None of the categories']
-    class_2_df = df[df['content'] == 'Homophobia']
-    class_3_df = df[df['content'] == 'Transphobia']
+    class_1_df = df[df['label'] == 'None of the categories']
+    class_2_df = df[df['label'] == 'Homophobia']
+    class_3_df = df[df['label'] == 'Transphobia']
 
     if len(class_1_df) > desired_samples:
         undersampled_class_1_df = class_1_df.sample(n=desired_samples, replace=True)

@@ -17,10 +17,11 @@ train_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv')
 val_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
 test_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv')
 
-train_df = random_undersample(train_df)
 train_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
 val_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
 test_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
+
+train_df = random_undersample(train_df)
 
 train_df['content'] = train_df['content'].apply(remove_numbers_and_urls)
 train_df['content'] = train_df['content'].apply(remove_newline_pattern)
@@ -79,7 +80,7 @@ training_args = TrainingArguments(
     evaluation_strategy='epoch',
     learning_rate=2e-5,
     num_train_epochs=3,
-    per_device_train_batch_size=32,
+    per_device_train_batch_size=8,
 )
 print('\033[96m' + 'Training arguments set.'+ '\033[0m')
 print()
@@ -119,9 +120,9 @@ tokenizer = AutoTokenizer.from_pretrained(modified_base)
 print('\033[96m' + 'Loaded Trained Model for inference'+ '\033[0m')
 print()
 
-val_data_loader = DataLoader(val_dataset, batch_size=32, collate_fn=data_collator)
-train_data_loader = DataLoader(train_dataset, batch_size=32, collate_fn=data_collator)
-test_data_loader = DataLoader(test_dataset, batch_size=32, collate_fn=data_collator)
+val_data_loader = DataLoader(val_dataset, batch_size=16, collate_fn=data_collator)
+train_data_loader = DataLoader(train_dataset, batch_size=16, collate_fn=data_collator)
+test_data_loader = DataLoader(test_dataset, batch_size=16, collate_fn=data_collator)
 
 print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
 print()
