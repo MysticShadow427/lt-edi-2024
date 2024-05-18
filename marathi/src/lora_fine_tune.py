@@ -16,9 +16,8 @@ base_model = 'l3cube-pune/marathi-bert-v2'
 train_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv')
 val_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
 test_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv')
-
+train_df = pd.concat([train_df, val_df])
 train_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
-val_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
 test_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
 
 train_df = random_undersample(train_df)
@@ -28,23 +27,19 @@ train_df['content'] = train_df['content'].apply(remove_newline_pattern)
 train_df['content'] = train_df['content'].apply(remove_pattern)
 train_df['content'] = train_df['content'].apply(remove_emojis)
 
-val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
-val_df['content'] = val_df['content'].apply(remove_newline_pattern)
-val_df['content'] = train_df['content'].apply(remove_pattern)
-val_df['content'] = val_df['content'].apply(remove_emojis)
 
 test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
 test_df['content'] = test_df['content'].apply(remove_newline_pattern)
-val_df['content'] = train_df['content'].apply(remove_pattern)
+test_df['content'] = test_df['content'].apply(remove_pattern)
 test_df['content'] = test_df['content'].apply(remove_emojis)
 
 train_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv',index = False)
-val_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv',index = False)
+
 test_df.to_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv',index = False)
 print('\033[96m' + 'Preprocessed CSV  ready'+ '\033[0m')
 
 train_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_train.csv')
-val_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
+
 test_dataset = load_dataset("csv", data_files='/content/lt-edi-2024/marathi/data/Marathi_test.csv')
 tokenizer = AutoTokenizer.from_pretrained(base_model)
 
@@ -66,11 +61,11 @@ def preprocess(examples):
 #     return tokenized
 
 tokenized_dataset_train = train_dataset.map(preprocess, batched=True,  remove_columns=["content"])
-tokenized_dataset_val = val_dataset.map(preprocess, batched=True,  remove_columns=["content"])
+
 tokenized_dataset_test = test_dataset.map(preprocess, batched=True,  remove_columns=["content"])
 
 train_dataset=tokenized_dataset_train['train']
-val_dataset=tokenized_dataset_val['train']
+
 test_dataset = tokenized_dataset_test['train']
 print('\033[96m' + 'Datasets ready'+ '\033[0m')
 print()
@@ -120,14 +115,12 @@ tokenizer = AutoTokenizer.from_pretrained(modified_base)
 print('\033[96m' + 'Loaded Trained Model for inference'+ '\033[0m')
 print()
 
-val_data_loader = DataLoader(val_dataset, batch_size=16, collate_fn=data_collator)
 train_data_loader = DataLoader(train_dataset, batch_size=16, collate_fn=data_collator)
 test_data_loader = DataLoader(test_dataset, batch_size=16, collate_fn=data_collator)
 
 print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
 print()
 y_pred_test, y_pred_probs_test, y_test = get_peft_predictions(model,test_data_loader)
-y_pred_val, y_pred_probs_val, y_val = get_peft_predictions(inference_model,val_data_loader)
 y_pred_train, y_pred_probs_train, y_train = get_peft_predictions(inference_model,train_data_loader)
 
 print('\033[96m' + 'Test Data Classification Report : '+ '\033[0m')
@@ -136,11 +129,7 @@ get_classification_report(y_test,y_pred_test)
 get_scores(y_test,y_pred_test)
 get_confusion_matrix(y_test,y_pred_test,class_names)
 print()
-print('\033[96m' + 'Val Data Classification Report : '+ '\033[0m')
-print()
-get_classification_report(y_val,y_pred_val)
-get_scores(y_val,y_pred_val)
-get_confusion_matrix(y_val,y_pred_val,class_names)
+
 print('\033[96m' + 'Train Data Classification Report : '+ '\033[0m')
 print()
 get_classification_report(y_train,y_pred_train)
