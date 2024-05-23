@@ -4,6 +4,7 @@ import seaborn as sns
 import csv
 import torch 
 import joblib
+from load_llm import SpanClassifier
 
 def create_directory(path):
     try:
@@ -61,3 +62,5 @@ def save_training_history(history,path):
                             'val_loss': history['val_loss'][epoch]})
 
     print("History saved to", path)
+
+

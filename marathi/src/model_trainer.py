@@ -12,7 +12,8 @@ def train_epoch(
   device,
   scheduler,
   n_examples,
-  num_views
+  num_views,
+  i
 ):
   model = model.train()
 
@@ -23,14 +24,20 @@ def train_epoch(
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
-
+    modules = [model.bert.embeddings,*model.bert.encoder.layer[:i]]
+    for module in modules:
+        for param in module.parameters():
+            param.requires_grad = True
     features,outputs = model(
       input_ids=input_ids,
       attention_mask=attention_mask
     )
     aug_features = augment_embeddings(features,num_views)
     _, preds = torch.max(outputs, dim=1)
-    loss = loss_fn(aug_features, targets)
+    # aug_features = aug_features/torch.sqrt(torch.tensor(768, dtype=torch.float32))
+    norms = torch.norm(aug_features, p=2, dim=2, keepdim=True)
+    aug_features= aug_features/ norms
+    loss = loss_fn(aug_features,outputs, targets)
 
     correct_predictions += torch.sum(preds == targets)
     losses.append(loss.item())
@@ -60,9 +67,13 @@ def eval_model(model, data_loader, loss_fn, device, n_examples,num_views):
         attention_mask=attention_mask
       )
       aug_features = augment_embeddings(features,num_views)
+      
+    #   aug_features = aug_features/torch.sqrt(torch.tensor(768, dtype=torch.float32))
+      norms = torch.norm(aug_features, p=2, dim=2, keepdim=True)
+      aug_features= aug_features/ norms
       _, preds = torch.max(outputs, dim=1)
      
-      loss = loss_fn(aug_features, targets)
+      loss = loss_fn(aug_features,outputs, targets)
 
       correct_predictions += torch.sum(preds == targets)
       losses.append(loss.item())

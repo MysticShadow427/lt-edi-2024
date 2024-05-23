@@ -112,7 +112,8 @@ if __name__ == "__main__":
             device,
             scheduler,
             len(train_df),
-            num_views
+            num_views,
+            epoch
         )
 
         print('\033[96m' + f'Train loss {train_loss} accuracy {train_acc}'+ '\033[0m')
@@ -137,13 +138,15 @@ if __name__ == "__main__":
         if val_acc > best_acc:
             torch.save(model.state_dict(), '/content/lt-edi-2024/marathi/artifacts/best_model_state_full_fine_tune.bin')
             torch.save(obj=model.state_dict(),f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth')
+            model.save_pretrained('/content/lt-edi-2024/marathi/artifacts/marbert',from_pt = True)
             best_acc = val_acc
     print()
     print('\033[96m' + 'Training finished'+ '\033[0m')
     print()
     plot_accuracy_loss(history)
-    history_csv_file_path = "/content/lt-edi-202/artifacts/history.csv"
-    save_training_history(history=history,path=history_csv_file_path)
+    history_csv_file_path = "/content/lt-edi-202/marathi/artifacts/history.csv"
+    # save_training_history(history=history,path=history_csv_file_path)
+    model = SpanClassifier(3,'/content/lt-edi-2024/marathi/artifacts/marbert')
     print('\033[96m' + 'Training History saved'+ '\033[0m')
     print()
 

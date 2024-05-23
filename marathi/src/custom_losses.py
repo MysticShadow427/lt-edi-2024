@@ -98,7 +98,7 @@ class SupervisedContrastiveLoss(nn.Module):
         return loss
 
 class SupConWithCrossEntropy(nn.Module):
-    def __init__(self,temperature=0.07, base_temperature=0.07,weight = 0.5):
+    def __init__(self,temperature=0.07, base_temperature=0.07,weight = 0.2):
         super().__init__()
         self.temperature = temperature
         self.base_temperature = base_temperature
@@ -107,5 +107,5 @@ class SupConWithCrossEntropy(nn.Module):
         self.weight = weight
 
     def forward(self,features,logits,labels):
-        return self.supcon(features,labels) + self.weight * self.cross_entropy(logits,labels)
+        return self.weight * self.supcon(features,labels) + self.cross_entropy(logits,labels)
 
