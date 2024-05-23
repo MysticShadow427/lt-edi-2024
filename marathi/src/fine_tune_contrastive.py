@@ -135,8 +135,8 @@ if __name__ == "__main__":
         history['val_loss'].append(val_loss)
 
         if val_acc > best_acc:
-            torch.save(model.state_dict(), '/content/lt-edi-2024/artifacts/best_model_state_full_fine_tune.bin')
-            torch.save(obj=model.state_dict(),f='/content/lt-edi-2024/artifacts/best_model_full_fine_tune.pth')
+            torch.save(model.state_dict(), '/content/lt-edi-2024/marathi/artifacts/best_model_state_full_fine_tune.bin')
+            torch.save(obj=model.state_dict(),f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth')
             best_acc = val_acc
     print()
     print('\033[96m' + 'Training finished'+ '\033[0m')
