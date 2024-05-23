@@ -37,8 +37,9 @@ if __name__ == "__main__":
     train_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_train.csv')
     val_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_dev.csv')
     test_df = pd.read_csv('/content/lt-edi-2024/marathi/data/Marathi_test.csv')
-    train_df = pd.concat([train_df, val_df])
+    # train_df = pd.concat([train_df, val_df])
     train_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
+    val_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
     test_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
     print('\033[96m' + 'Loaded Training, validation and test dataframes'+ '\033[0m')
     print()
@@ -48,6 +49,11 @@ if __name__ == "__main__":
     train_df['content'] = train_df['content'].apply(remove_newline_pattern)
     train_df['content'] = train_df['content'].apply(remove_pattern)
     train_df['content'] = train_df['content'].apply(remove_emojis)
+    
+    val_df['content'] = val_df['content'].apply(remove_numbers_and_urls)
+    val_df['content'] = val_df['content'].apply(remove_newline_pattern)
+    val_df['content'] = val_df['content'].apply(remove_pattern)
+    val_df['content'] = val_df['content'].apply(remove_emojis)
 
 
     test_df['content'] = test_df['content'].apply(remove_numbers_and_urls)
@@ -66,6 +72,7 @@ if __name__ == "__main__":
     class_to_index = {tag: i for i, tag in enumerate(tags)}
     # Encode labels
     train_df["label"] = train_df["label"].map(class_to_index)
+    val_df["label"] = val_df["label"].map(class_to_index)
     test_df["label"] = test_df["label"].map(class_to_index)
     class_names = ['None of the categories','Homophobia','Transphobia']
 
@@ -79,6 +86,7 @@ if __name__ == "__main__":
     print()
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
+    val_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
     test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
     print('\033[96m' + 'Dataloaders created')
     print()
@@ -153,6 +161,7 @@ if __name__ == "__main__":
     print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
     print()
     y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
+    y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(model,val_data_loader)
     y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions(model,train_data_loader)
 
     print('Test Data Classification Report : ')
@@ -160,6 +169,11 @@ if __name__ == "__main__":
     get_classification_report(y_test,y_pred_test)
     get_scores(y_test,y_pred_test)
     get_confusion_matrix(y_test,y_pred_test,class_names)
+    print('Val Data Classification Report : ')
+    print()
+    get_classification_report(y_val,y_pred_val)
+    get_scores(y_val,y_pred_val)
+    get_confusion_matrix(y_val,y_pred_val,class_names)
     print('\033[96m' + 'Train Data Classification Report : '+ '\033[0m')
     print()
     get_classification_report(y_train,y_pred_train)
