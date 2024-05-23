@@ -2,7 +2,7 @@ from transformers import AutoModel
 import torch
 import torch.nn as nn
 
-checkpoint = 'marathi-bert-lt-edi'
+checkpoint = 'l3cube-pune/marathi-bert-v2'
 
 class SpanClassifier(nn.Module):
 

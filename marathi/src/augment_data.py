@@ -19,7 +19,7 @@ def random_undersample(df,random_seed = 42,desired_samples = 450):
 
     return augmented_df
 
-def augment_embeddings(embeddings, num_views=2, noise_std_range=(0.05, 0.15), rotation_angle_range=(-30, 30)):
+def augment_embeddings(embeddings, num_views=2, noise_std_range=(0.05, 0.15)):
     batch_size, embedding_dim = embeddings.shape
     augmented_embeddings = torch.zeros(batch_size, num_views + 1, embedding_dim, device=embeddings.device)
     
@@ -27,20 +27,16 @@ def augment_embeddings(embeddings, num_views=2, noise_std_range=(0.05, 0.15), ro
     augmented_embeddings[:, 0, :] = embeddings
     
     for i in range(1, num_views + 1):
-        # Randomly select noise standard deviation and rotation angle
+        # Randomly select noise standard deviation
         noise_std = torch.empty(1).uniform_(*noise_std_range).item()
-        rotation_angle = torch.empty(1).uniform_(*rotation_angle_range).item()
         
         # Add Gaussian noise to the embeddings
         noise = torch.randn_like(embeddings) * noise_std
         augmented = embeddings + noise
         
-        # Rotate the embeddings
-        rotation_angle_rad = torch.tensor(rotation_angle * torch.pi / 180)
-        rotation_matrix = torch.tensor([
-            [torch.cos(rotation_angle_rad), -torch.sin(rotation_angle_rad)],
-            [torch.sin(rotation_angle_rad), torch.cos(rotation_angle_rad)]
-        ], dtype=torch.float32).to(embeddings.device)
+        # Apply a random rotation matrix
+        rotation_matrix = torch.randn(embedding_dim, embedding_dim).to(embeddings.device)
+        rotation_matrix, _ = torch.linalg.qr(rotation_matrix)  # Ensure the matrix has orthogonal columns
         
         # Apply the rotation matrix to each embedding vector
         augmented = torch.matmul(augmented, rotation_matrix)

@@ -69,7 +69,7 @@ if __name__ == "__main__":
     test_df["label"] = test_df["label"].map(class_to_index)
     class_names = ['None of the categories','Homophobia','Transphobia']
 
-    checkpoint = 'dccuchile/bert-base-spanish-wwm-uncased'
+    checkpoint = 'l3cube-pune/marathi-bert-v2'
 
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     print('\033[96m' + 'Tokenizer Loaded'+ '\033[0m')
