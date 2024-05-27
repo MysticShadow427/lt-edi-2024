@@ -94,7 +94,7 @@ if __name__ == "__main__":
     total_steps = len(train_data_loader) * EPOCHS
 
     loss_fn = SupervisedContrastiveLoss()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, correct_bias=False)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     scheduler = get_linear_schedule_with_warmup(
                 optimizer,
                 num_warmup_steps=0,

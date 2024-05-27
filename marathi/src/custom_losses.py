@@ -92,7 +92,7 @@ class SupConWithCrossEntropy(nn.Module):
         self.weight = weight
 
     def forward(self,features,logits,labels):
-        return self.weight * self.supcon(features,labels) + self.cross_entropy(logits,labels)
+        return self.weight * self.supcon(features=features,labels= labels) + self.cross_entropy(logits,labels)
 
 class DualConWithCrossEntropy(nn.Module):
     pass
