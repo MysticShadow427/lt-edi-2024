@@ -10,11 +10,11 @@ class SupervisedContrastiveLoss(nn.Module):
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
 
-    def forward(self, features, labels=None, mask=None):
+    def forward(self, features, labels):
         device = (torch.device('cuda')
                   if features.is_cuda
                   else torch.device('cpu'))
-
+        mask = None
         if len(features.shape) < 3:
             raise ValueError('`features` needs to be [bsz, n_views, ...],'
                              'at least 3 dimensions are required')

@@ -37,7 +37,7 @@ def train_epoch(
     # aug_features = aug_features/torch.sqrt(torch.tensor(768, dtype=torch.float32))
     norms = torch.norm(aug_features, p=2, dim=2, keepdim=True)
     aug_features= aug_features/ norms
-    loss = loss_fn(aug_features,outputs, targets)
+    loss = loss_fn(features=aug_features,logits=outputs, labels=targets)
 
     correct_predictions += torch.sum(preds == targets)
     losses.append(loss.item())
