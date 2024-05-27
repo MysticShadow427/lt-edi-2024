@@ -86,14 +86,14 @@ if __name__ == "__main__":
     print()
 
     train_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
-    val_data_loader = create_data_loader(train_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
+    val_data_loader = create_data_loader(val_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
     test_data_loader = create_data_loader(test_df,tokenizer=tokenizer,max_len=500,batch_size=batch_size)
     print('\033[96m' + 'Dataloaders created')
     print()
 
     total_steps = len(train_data_loader) * EPOCHS
 
-    loss_fn = SupervisedContrastiveLoss()
+    loss_fn = SupConWithCrossEntropy()
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
     scheduler = get_linear_schedule_with_warmup(
                 optimizer,
@@ -146,7 +146,7 @@ if __name__ == "__main__":
         if val_acc > best_acc:
             torch.save(model.state_dict(), '/content/lt-edi-2024/marathi/artifacts/best_model_state_full_fine_tune.bin')
             torch.save(obj=model.state_dict(),f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth')
-            model.save_pretrained('/content/lt-edi-2024/marathi/artifacts/marbert',from_pt = True)
+            # model.save_pretrained('/content/lt-edi-2024/marathi/artifacts/marbert',from_pt = True)
             best_acc = val_acc
     print()
     print('\033[96m' + 'Training finished'+ '\033[0m')
@@ -154,7 +154,9 @@ if __name__ == "__main__":
     plot_accuracy_loss(history)
     history_csv_file_path = "/content/lt-edi-202/marathi/artifacts/history.csv"
     # save_training_history(history=history,path=history_csv_file_path)
-    model = SpanClassifier(3,'/content/lt-edi-2024/marathi/artifacts/marbert')
+    model = SpanClassifier()
+    model.load_state_dict(torch.load(f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth'))
+    model = model.to('cuda')
     print('\033[96m' + 'Training History saved'+ '\033[0m')
     print()
 
