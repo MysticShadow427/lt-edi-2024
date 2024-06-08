@@ -35,7 +35,7 @@ class LorafiedSpanClassifier(nn.Module):
       self.bert = AutoModel.from_pretrained(self.checkpoint,return_dict=False)
       for param in self.bert.parameters():
         param.requires_grad = False
-      self.peft_config = LoraConfig(inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1,target_modules='all-linear')
+      self.peft_config = LoraConfig(inference_mode=False, r=64, lora_alpha=128, lora_dropout=0.4,target_modules='all-linear')
       self.peft_model = get_peft_model(self.bert, self.peft_config)
       self.drop = nn.Dropout(p=0.4)
       self.out = nn.Linear(self.bert.config.hidden_size, n_classes)
