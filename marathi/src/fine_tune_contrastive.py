@@ -2,10 +2,10 @@ from collections import defaultdict
 import argparse
 from model_trainer import train_epoch,eval_model
 from dataloaders import create_data_loader
-from load_llm import SpanClassifier
+from load_llm import SpanClassifier,LorafiedSpanClassifier
 from custom_losses import SupConWithCrossEntropy,SupervisedContrastiveLoss
 from utils import plot_accuracy_loss,save_training_history,create_directory
-from transformers import AutoModel,AutoTokenizer,get_linear_schedule_with_warmup
+from transformers import AutoModel,AutoTokenizer,get_linear_schedule_with_warmup,AutoModelForSequenceClassification
 from peft import LoraConfig, get_peft_model
 import torch
 import torch.nn as nn
@@ -78,7 +78,11 @@ if __name__ == "__main__":
     val_df["label"] = val_df["label"].map(class_to_index)
     test_df["label"] = test_df["label"].map(class_to_index)
     class_names = ['None of the categories','Homophobia','Transphobia']
+    num_labels = 3
+    class_names = ['None of the categories','Homophobia','Transphobia']
 
+    id2label = {i: label for i, label in enumerate(class_names)}
+    label2id = {label: i for i,label in enumerate(class_names)}
     checkpoint = 'l3cube-pune/marathi-bert-v2'
 
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
@@ -88,9 +92,7 @@ if __name__ == "__main__":
     if not lora:
         model = SpanClassifier().to(device)
     else:
-        model = SpanClassifier().to(device)
-        peft_config = LoraConfig(task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1,target_modules='all-linear')
-        model = get_peft_model(model, peft_config)
+        model =  LorafiedSpanClassifier().to(device)
         
     print('\033[96m' + 'Model Marathi BERT Loaded'+ '\033[0m')
     print()
@@ -161,12 +163,12 @@ if __name__ == "__main__":
     print()
     print('\033[96m' + 'Training finished'+ '\033[0m')
     print()
-    plot_accuracy_loss(history)
-    history_csv_file_path = "/content/lt-edi-202/marathi/artifacts/history.csv"
+    # plot_accuracy_loss(history)
+    # history_csv_file_path = "/content/lt-edi-202/marathi/artifacts/history.csv"
     # save_training_history(history=history,path=history_csv_file_path)
-    model = SpanClassifier()
-    model.load_state_dict(torch.load(f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth'))
-    model = model.to('cuda')
+    # model = SpanClassifier()
+    # model.load_state_dict(torch.load(f='/content/lt-edi-2024/marathi/artifacts/best_model_full_fine_tune.pth'))
+    # model = model.to('cuda')
     print('\033[96m' + 'Training History saved'+ '\033[0m')
     print()
 
