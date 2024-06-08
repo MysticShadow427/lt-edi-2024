@@ -24,7 +24,7 @@ def train_epoch(
     input_ids = d["input_ids"].to(device)
     attention_mask = d["attention_mask"].to(device)
     targets = d["targets"].to(device)
-    modules = [model.bert.embeddings,*model.bert.encoder.layer[:i]]
+    modules = [*model.bert.encoder.layer[:i]]
     for module in modules:
         for param in module.parameters():
             param.requires_grad = True
