@@ -8,6 +8,7 @@ from evaluate_model import get_confusion_matrix,get_classification_report,get_pe
 from augment_data import random_undersample
 import pandas as pd
 from preprocess_data import remove_newline_pattern,remove_numbers_and_urls,remove_emojis,remove_pattern
+from dataloaders import get_trainer
 
 peft_model_name = 'marathi-bert-lt-edi'
 modified_base = 'marathi-bert-modified-lt-edi'
@@ -85,14 +86,6 @@ training_args = TrainingArguments(
 print('\033[96m' + 'Training arguments set.'+ '\033[0m')
 print()
 
-def get_trainer(model):
-      return  Trainer(
-          model=model,
-          args=training_args,
-          train_dataset=train_dataset,
-          eval_dataset=test_dataset,
-          data_collator=data_collator,
-      )
 
 model = AutoModelForSequenceClassification.from_pretrained(base_model, id2label=id2label)
 print('\033[96m' + 'Loaded pretrained Marathi BERT'+ '\033[0m')
@@ -119,6 +112,7 @@ inference_model = AutoPeftModelForSequenceClassification.from_pretrained(peft_mo
 tokenizer = AutoTokenizer.from_pretrained(modified_base)
 print('\033[96m' + 'Loaded Trained Model for inference'+ '\033[0m')
 print()
+
 
 train_data_loader = DataLoader(train_dataset, batch_size=16, collate_fn=data_collator)
 val_data_loader = DataLoader(val_dataset, batch_size=16, collate_fn=data_collator)

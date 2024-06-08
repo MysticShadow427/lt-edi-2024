@@ -6,6 +6,7 @@ from load_llm import SpanClassifier
 from custom_losses import SupConWithCrossEntropy,SupervisedContrastiveLoss
 from utils import plot_accuracy_loss,save_training_history,create_directory
 from transformers import AutoModel,AutoTokenizer,get_linear_schedule_with_warmup
+from peft import LoraConfig, get_peft_model
 import torch
 import torch.nn as nn
 import pandas as pd
@@ -22,6 +23,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate",type=float,help="learning rate")
     parser.add_argument("--batch_size",type=int,help="batch size forr training")
     parser.add_argument("--num_views",type=int,help="number of views for the contrastive loss")
+    parser.add_argument("--lora",type=int,help="add adapter layers or not")
 
     args = parser.parse_args()
 
@@ -29,6 +31,7 @@ if __name__ == "__main__":
     batch_size = args.batch_size
     learning_rate = args.learning_rate
     num_views = args.num_views
+    lora = args.lora
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print('\033[96m' + 'Device : ',device + '\033[0m')
@@ -81,7 +84,14 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     print('\033[96m' + 'Tokenizer Loaded'+ '\033[0m')
     print()
-    model = SpanClassifier().to(device)
+    model = None
+    if not lora:
+        model = SpanClassifier().to(device)
+    else:
+        model = SpanClassifier().to(device)
+        peft_config = LoraConfig(task_type="SEQ_CLS", inference_mode=False, r=8, lora_alpha=16, lora_dropout=0.1,target_modules='all-linear')
+        model = get_peft_model(model, peft_config)
+        
     print('\033[96m' + 'Model Marathi BERT Loaded'+ '\033[0m')
     print()
 

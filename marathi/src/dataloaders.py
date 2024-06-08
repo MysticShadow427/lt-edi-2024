@@ -1,5 +1,6 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
+from transformers import Trainer
 
 class SpanDataset(Dataset):
 
@@ -47,3 +48,12 @@ def create_data_loader(df, tokenizer, max_len, batch_size):
     batch_size=batch_size,
     shuffle=True
 )
+
+def get_trainer(model,training_args,train_dataset,test_dataset,data_collator):
+      return  Trainer(
+          model=model,
+          args=training_args,
+          train_dataset=train_dataset,
+          eval_dataset=test_dataset,
+          data_collator=data_collator,
+      )
