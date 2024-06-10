@@ -1,19 +1,19 @@
 from collections import defaultdict
 import argparse
-from marathi.src.model_trainer import train_epoch,eval_model
-from marathi.src.dataloaders import create_data_loader
-from marathi.src.load_llm import SpanClassifier,LorafiedSpanClassifier
-from marathi.src.custom_losses import SupConWithCrossEntropy,SupervisedContrastiveLoss
-from marathi.src.utils import plot_accuracy_loss,save_training_history,create_directory
+from ...marathi.src.model_trainer import train_epoch,eval_model
+from ...marathi.src.dataloaders import create_data_loader
+from ...marathi.src.load_llm import SpanClassifier,LorafiedSpanClassifier
+from ...marathi.src.custom_losses import SupConWithCrossEntropy,SupervisedContrastiveLoss
+from ...marathi.src.utils import plot_accuracy_loss,save_training_history,create_directory
 from transformers import AutoModel,AutoTokenizer,get_linear_schedule_with_warmup,AutoModelForSequenceClassification
 from peft import LoraConfig, get_peft_model
 import torch
 import torch.nn as nn
 import pandas as pd
 import numpy as np
-from marathi.src.evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report
-from marathi.src.augment_data import random_undersample
-from marathi.src.load_llm import SpanClassifier
+from ...marathi.src.evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report
+from ...marathi.src.augment_data import random_undersample
+from ...marathi.src.load_llm import SpanClassifier
 
 
 if __name__ == "__main__":
