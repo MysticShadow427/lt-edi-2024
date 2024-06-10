@@ -4,8 +4,8 @@ from peft import LoraConfig, get_peft_model
 from peft import AutoPeftModelForSequenceClassification
 from datasets import load_dataset
 from torch.utils.data import DataLoader
-from ...marathi.src.evaluate_model import get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
-from ...marathi.src.augment_data import random_undersample
+from evaluate_model import get_confusion_matrix,get_classification_report,get_peft_predictions,get_scores
+from augment_data import random_undersample
 import pandas as pd
 from ...marathi.src.dataloaders import get_trainer
 
