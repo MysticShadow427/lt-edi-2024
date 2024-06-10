@@ -13,9 +13,9 @@ import torch
 import torch.nn as nn
 import pandas as pd
 import numpy as np
-from src.evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report
-from src.augment_data import random_undersample
-from src.load_llm import SpanClassifier
+from evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report
+from augment_data import random_undersample
+from load_llm import SpanClassifier
 
 
 if __name__ == "__main__":
@@ -42,9 +42,9 @@ if __name__ == "__main__":
     val_df = pd.read_csv('/content/lt-edi-2024/telugu/data/homo_Telugu_dev.csv')
     test_df = pd.read_csv('/content/lt-edi-2024/telugu/data/homo_Telugu_test.csv')
     # train_df = pd.concat([train_df, val_df])
-    train_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
-    val_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
-    test_df.rename(columns={'Text': 'content','Category ':'label'}, inplace=True)
+    train_df.rename(columns={'Text': 'content','Category':'label'}, inplace=True)
+    val_df.rename(columns={'Text': 'content','Category':'label'}, inplace=True)
+    test_df.rename(columns={'Text': 'content','Category':'label'}, inplace=True)
     print('\033[96m' + 'Loaded Training, validation and test dataframes'+ '\033[0m')
     print()
     # train_df = random_undersample(train_df)
