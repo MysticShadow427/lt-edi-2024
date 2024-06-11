@@ -6,7 +6,7 @@ import torch.nn as nn
 
 class SpanClassifier(nn.Module):
 
-  def __init__(self, n_classes=3,checkpoint = 'l3cube-pune/marathi-bert-v2'):
+  def __init__(self, n_classes=3,checkpoint = 'l3cube-pune/telugu-bert'):
     super(SpanClassifier, self).__init__()
     self.checkpoint = checkpoint
     self.bert = AutoModel.from_pretrained(self.checkpoint,return_dict=False)
