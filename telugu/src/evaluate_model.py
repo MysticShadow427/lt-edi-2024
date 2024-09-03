@@ -70,6 +70,7 @@ def get_predictions(model, data_loader):
     predictions = []
     prediction_probs = []
     real_values = []
+    embeddings = []
 
     with torch.no_grad():
         for d in data_loader:
@@ -79,7 +80,7 @@ def get_predictions(model, data_loader):
             attention_mask = d["attention_mask"].to(device)
             targets = d["targets"].to(device)
 
-            _,outputs = model(
+            feats,outputs = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask
             )
@@ -91,8 +92,53 @@ def get_predictions(model, data_loader):
             predictions.extend(preds)
             prediction_probs.extend(probs)
             real_values.extend(targets)
+            embeddings.extend(feats)
 
     predictions = torch.stack(predictions).cpu()
     prediction_probs = torch.stack(prediction_probs).cpu()
     real_values = torch.stack(real_values).cpu()
-    return review_texts, predictions, prediction_probs, real_values
+    embeddings = torch.stack(embeddings).cpu().numpy()
+    return review_texts, predictions, prediction_probs, real_values,embeddings
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+import os
+
+def visualize_pca_embeddings(embeddings, labels):
+    """
+    Visualize BERT embeddings in 2D using PCA and save the plot.
+
+    Parameters:
+    embeddings (numpy.ndarray): The BERT embeddings.
+    labels (list or numpy.ndarray): The corresponding labels for the embeddings.
+    """
+    # Ensure embeddings and labels are numpy arrays
+    embeddings = np.array(embeddings)
+    labels = np.array(labels)
+
+    # Perform PCA to reduce dimensionality to 2D
+    pca = PCA(n_components=2)
+    embeddings_2d = pca.fit_transform(embeddings)
+
+    # Create a scatter plot
+    plt.figure(figsize=(10, 7))
+    unique_labels = np.unique(labels)
+    for label in unique_labels:
+        subset = embeddings_2d[labels == label]
+        plt.scatter(subset[:, 0], subset[:, 1], label=label, alpha=0.7)
+
+    # Add legend
+    plt.legend()
+    plt.title('2D PCA Visualization of Embeddings')
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+
+    # Save the plot
+    output_file = os.path.join(os.getcwd(), 'pca_bert_embeddings.png')
+    plt.savefig(output_file)
+    print(f"Plot saved as {output_file}")
+
+    # Show the plot
+    plt.show()
+

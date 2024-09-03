@@ -12,7 +12,7 @@ import torch.nn as nn
 import pandas as pd
 import numpy as np
 from preprocess_data import remove_newline_pattern,remove_numbers_and_urls,remove_pattern,remove_emojis
-from evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report
+from evaluate_model import get_confusion_matrix,get_predictions,get_scores,get_classification_report,visualize_pca_embeddings
 from augment_data import random_undersample
 from load_llm import SpanClassifier
 
@@ -174,10 +174,10 @@ if __name__ == "__main__":
 
     print('\033[96m' + 'Getting Predictions...'+ '\033[0m')
     print()
-    y_review_texts_test, y_pred_test, y_pred_probs_test, y_test = get_predictions(model,test_data_loader)
-    y_review_texts_val, y_pred_val, y_pred_probs_val, y_val = get_predictions(model,val_data_loader)
-    y_review_texts_train, y_pred_train, y_pred_probs_train, y_train = get_predictions(model,train_data_loader)
-
+    y_review_texts_test, y_pred_test, y_pred_probs_test, y_test, embeddings = get_predictions(model,test_data_loader)
+    y_review_texts_val, y_pred_val, y_pred_probs_val, y_val,_ = get_predictions(model,val_data_loader)
+    y_review_texts_train, y_pred_train, y_pred_probs_train, y_train,_ = get_predictions(model,train_data_loader)
+    visualize_pca_embeddings(embeddings,y_test)
     print('Test Data Classification Report : ')
     print()
     get_classification_report(y_test,y_pred_test)
